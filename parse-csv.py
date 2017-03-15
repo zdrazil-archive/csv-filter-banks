@@ -153,7 +153,7 @@ def create_filtered_csv(from_utf8_file: str) -> str:
 
 
 def create_final_file(from_final_file: str) -> str:
-    to_final_file = "PLATBY.txt"
+    to_final_file = "PLATBY-CZ.txt"
 
     # Save to a file
     with open(from_final_file, newline='', encoding="utf-8") as from_final_file_csv:
@@ -205,7 +205,7 @@ def create_final_file(from_final_file: str) -> str:
         file_out.close()
 
     output_file_path = os.path.abspath(to_final_file)
-    print("\n Soubor byl vytvořen. Jmenuje se PLATBY.TXT a je ve složce \n"
+    print("\n Soubor byl vytvořen. Jmenuje se PLATBY-CZ.TXT a je ve složce \n"
           "odkud jste spustil/a tento program, tedy zde: \n"
           + output_file_path)
     return to_final_file
