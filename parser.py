@@ -1,3 +1,4 @@
+""" Parser for payments in csv"""
 import codecs
 import csv
 import datetime
@@ -73,7 +74,6 @@ def get_clean_table(columns, csv_reader):
 
     :param csv_reader: csv_reader with a file to filter
     """
-    columns = [amount:, date:, name: var_symbol:]
     filtered_csv = []
     for csv_row in csv_reader:
         try:
