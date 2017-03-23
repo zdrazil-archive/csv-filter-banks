@@ -52,7 +52,7 @@ def get_csv_reader(csv_file, encoding, delimiter, quotechar):
     return csv_reader
 
 
-def get_table_without_header(columns, csv_reader):
+def get_clean_table(columns, csv_reader):
     columns = [amount:, date:, name: symbol:]
     filtered_csv = []
     for csv_row in csv_reader:
@@ -104,4 +104,30 @@ def create_final_file(filtered_payments, to_final_file):
         file_out.write("Nic nenalezeno")
     else:
         for row_final in filtered_payments:
+            temp_date = date_from_string(row_final[0])
+            row_final[date] = (temp_date.strftime('%d.%m.%Y')).strip()
+
+            temp_amount = locale.format("%.2f", float(row_final[3].replace(',', '.')), grouping=True)
+            row_final[amount] = temp_amount
+
+    # Calculate columns widths
+    col_width_date = max(len(row[0]) for row in info_array) + padding
+    col_width_company = max(len(row[1]) for row in info_array) + padding
+    col_width_var_symbol = max(len(row[2]) for row in info_array) + padding
+
+    for row_final in info_array:
+        file_out.write(row_final[0].ljust(col_width_date)
+                   + row_final[1].ljust(col_width_company)
+                   + row_final[2].ljust(col_width_var_symbol)
+                   + row_final[3].ljust(col_width_var_symbol)
+                   + "\n")
+
+    file_out.close()
+
+    output_file_path = os.path.abspath(to_final_file)
+    print("\n Soubor byl vytvořen. Jmenuje se " + to_final_file
+          + "a je ve složce \n"
+          "odkud jste spustil/a tento program, tedy zde: \n"
+          + output_file_path)
+
 
