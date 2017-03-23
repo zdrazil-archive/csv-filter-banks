@@ -1,10 +1,8 @@
 """ Parser for payments in csv"""
-import codecs
 import csv
 import datetime
 import locale
 import os
-import pandas
 import tkinter as tk
 from tkinter import filedialog
 
@@ -33,7 +31,7 @@ def get_amount():
     while True:
         try:
             amount = float(input("Nad jakou částku mají platby být? \n"
-                         "Zadejte prosím číslo bez mezer \n"))
+                                 "Zadejte prosím číslo bez mezer \n"))
             break
         except ValueError:
             print("Zadejte prosím částku bez mezer")
@@ -76,16 +74,11 @@ def get_clean_table(columns, csv_reader):
     """
     filtered_csv = []
     for csv_row in csv_reader:
-        try:
-            amount = float(csv_row[columns[amount]])
-        except ValueError:
-            pass
-        else:
-            filtered_csv_row = [csv_row[columns[date]],
-                                csv_row[columns[name]],
-                                csv_row[columns[var_symbol]],
-                                csv_row[columns[amount]]]
-            filtered_csv.append(filtered_csv_row)
+        filtered_csv_row = [csv_row[columns['date']],
+                            csv_row[columns['name']],
+                            csv_row[columns['var_symbol']],
+                            csv_row[columns['amount']]]
+        filtered_csv.append(filtered_csv_row)
     return filtered_csv
 
 
@@ -114,13 +107,29 @@ def get_filtered_payments(payments):
         try:
             dates = get_date_range()
             filter_amount = get_amount()
-            if dates[0] <= payment[date] <= dates[1]:
-                if float(payment[amount]) >= filter_amount:
+            if dates[0] <= payment['date'] <= dates[1]:
+                if float(payment['amount']) >= filter_amount:
                     filtered_payments.append(payment)
         except ValueError:
             pass
                                                  
     return filtered_payments
+
+
+def format_date(date):
+    """ Return formatted date 
+
+    :param date: datetime object
+    """
+    return (date.strftime('%d.%m.%Y')).strip()
+
+
+def format_amount(amount_string):
+    """ Return formatted amount
+
+    :param amount_string: float amount string
+    """
+    return locale.format("%.2f", float(amount_string), grouping=True)
 
 
 def create_final_file(filtered_payments, to_final_file):
@@ -130,33 +139,27 @@ def create_final_file(filtered_payments, to_final_file):
     :param to_final_file: string name of the final output file
     """
     try:
-        os.remove(to.final_file)
+        os.remove(to_final_file)
     except OSError:
         pass
 
     file_out = open(to_final_file, 'w', encoding='utf-8')
 
+    # Format text file to have columns aligned
+    padding = 2
+    # Calculate columns widths
+    col_width_date = max(len(row[0]) for row in filtered_payments) + padding
+    col_width_company = max(len(row[1]) for row in filtered_payments) + padding
+    col_width_var_symbol = max(len(row[2]) for row in filtered_payments) + padding
+    
     if len(filtered_payments) < 1:
         file_out.write("Nic nenalezeno")
-    else:
-        for row_final in filtered_payments:
-            temp_date = date_from_string(row_final[0])
-            row_final[date] = (temp_date.strftime('%d.%m.%Y')).strip()
-
-            temp_amount = locale.format("%.2f", float(row_final[3].replace(',', '.')), grouping=True)
-            row_final[amount] = temp_amount
-
-    # Calculate columns widths
-    col_width_date = max(len(row[0]) for row in info_array) + padding
-    col_width_company = max(len(row[1]) for row in info_array) + padding
-    col_width_var_symbol = max(len(row[2]) for row in info_array) + padding
-
-    for row_final in info_array:
+    for row_final in filtered_payments:
         file_out.write(row_final[0].ljust(col_width_date)
-                   + row_final[1].ljust(col_width_company)
-                   + row_final[2].ljust(col_width_var_symbol)
-                   + row_final[3].ljust(col_width_var_symbol)
-                   + "\n")
+                       + row_final[1].ljust(col_width_company)
+                       + row_final[2].ljust(col_width_var_symbol)
+                       + row_final[3].ljust(col_width_var_symbol)
+                       + "\n")
 
     file_out.close()
 
@@ -165,5 +168,4 @@ def create_final_file(filtered_payments, to_final_file):
           + "a je ve složce \n"
           "odkud jste spustil/a tento program, tedy zde: \n"
           + output_file_path)
-
 
