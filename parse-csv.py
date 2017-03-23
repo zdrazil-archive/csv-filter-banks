@@ -125,7 +125,7 @@ def create_filtered_csv(from_utf8_file: str) -> str:
             if 14 < len(row_csv):
                 # header_row = None
                 # Castka column
-                input_string = row_csv[3]
+                input_string = row_csv[7]
                 # Check if the column is number
                 try:
                     value_csv = float(input_string.replace(',', '.'))
@@ -136,7 +136,7 @@ def create_filtered_csv(from_utf8_file: str) -> str:
                 else:
                     if value_csv >= money_value:
                         # Date column - Datum zpracovani
-                        input_string_csv = row_csv[14]
+                        input_string_csv = row_csv[0]
                         # Check if the column is a date
                         try:
                             row_date_csv = datetime.datetime.strptime(input_string_csv, '%Y/%m/%d')
@@ -175,26 +175,31 @@ def create_final_file(from_final_file: str) -> str:
                 row_array = [row_final[13], row_final[9], row_final[16], row_final[3]]
 
                 info_array.append(row_array)
+        
+        if len(info_array) < 1:
+            # info_array = ["Nic Nenalezeno", "0" , "0", "0"]
+            file_out.write("Nic nenalezeno")
+        else:
+            for row_final in info_array:
+                # Change format of date
+                temp_date = datetime.datetime.strptime(row_final[0], '%Y/%m/%d')
+                row_final[0] = (temp_date.strftime('%d.%m.%Y')).strip()
 
-        for row_final in info_array:
-            # Change format of date
-            temp_date = datetime.datetime.strptime(row_final[0], '%Y/%m/%d')
-            row_final[0] = (temp_date.strftime('%d.%m.%Y')).strip()
+                # Format Amount
+                # locale.setlocale(locale.LC_ALL, '')
+                temp_amount = locale.format("%.2f", float(row_final[3].replace(',', '.')), grouping=True)
+                row_final[3] = temp_amount
 
-            # Format Amount
-            locale.setlocale(locale.LC_ALL, '')
-            temp_amount = locale.format("%.2f", float(row_final[3].replace(',', '.')), grouping=True)
-            row_final[3] = temp_amount
 
-        # Format text file to have columns aligned
-        padding = 2
-        # Calculate columns widths
-        col_width_date = max(len(row[0]) for row in info_array) + padding
-        col_width_company = max(len(row[1]) for row in info_array) + padding
-        col_width_var_symbol = max(len(row[2]) for row in info_array) + padding
+            # Format text file to have columns aligned
+            padding = 2
+            # Calculate columns widths
+            col_width_date = max(len(row[0]) for row in info_array) + padding
+            col_width_company = max(len(row[1]) for row in info_array) + padding
+            col_width_var_symbol = max(len(row[2]) for row in info_array) + padding
 
-        for row_final in info_array:
-            file_out.write(row_final[0].ljust(col_width_date)
+            for row_final in info_array:
+                file_out.write(row_final[0].ljust(col_width_date)
                            + row_final[1].ljust(col_width_company)
                            + row_final[2].ljust(col_width_var_symbol)
                            + row_final[3].ljust(col_width_var_symbol)
