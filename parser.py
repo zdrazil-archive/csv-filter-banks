@@ -47,39 +47,20 @@ def get_file_path():
     return user_file_path
 
 
-def get_csv_reader(csv_file, encoding, delimiter, quotechar):
+def get_csv_reader(encoding, delimiter, quotechar):
     """ Open file in csv_reader and return the reader
 
-    :param csv_file: file to open
     :param encoding: encoding of the file 
     :param delimiter: A one-character string used to separate fields
     :param quotechar: A one-character string used to quote fields 
                       containing special characters
     """
+    csv_file = get_file_path()
     opened_csv_file = open(csv_file, newline='', encoding=encoding)
     csv_reader = csv.reader(opened_csv_file,
                             delimiter=delimiter,
                             quotechar=quotechar)
     return csv_reader
-
-
-def get_clean_table(columns, csv_reader):
-    """ Return dictionary with specified columns. 
-
-    :param columns: dictionary in the format {column_type: column_number} 
-    required keys: date, name, var_symbol, amount
-    value: int
-
-    :param csv_reader: csv_reader with a file to filter
-    """
-    filtered_csv = []
-    for csv_row in csv_reader:
-        filtered_csv_row = [csv_row[columns['date']],
-                            csv_row[columns['name']],
-                            csv_row[columns['var_symbol']],
-                            csv_row[columns['amount']]]
-        filtered_csv.append(filtered_csv_row)
-    return filtered_csv
 
 
 def date_from_string(date_string, date_format):
@@ -96,17 +77,49 @@ def date_from_string(date_string, date_format):
     return date
 
 
-def get_filtered_payments(payments):
+def get_payments(columns, csv_reader, date_format):
+    """ Return dictionary with specified columns. 
+
+    :param columns: dictionary in the format {column_type: column_number} 
+    required keys: date, name, var_symbol, amount
+    value: int
+
+    :param csv_reader: csv_reader with a file to filter
+    """
+    filtered_csv = []
+    for csv_row in csv_reader:
+       # Check if it's a header or incomplete row
+        if len(csv_row) < 5: 
+            continue
+
+        try:
+            if (csv_row[columns['amount']][1]).isalpha():
+                continue
+        except IndexError:
+            continue
+        except ValueError:
+            continue
+
+        temp_date = date_from_string(csv_row[columns['date']], date_format)         
+        filtered_csv_row = { 'date': temp_date,
+                            'name': csv_row[columns['name']],
+                            'var_symbol': csv_row[columns['var_symbol']],
+                            'amount': csv_row[columns['amount']]}
+        filtered_csv.append(filtered_csv_row)
+    return filtered_csv
+
+
+def filter_payments(payments):
     """ Return payment following user given filters
 
     :param payments: dictionary of payments 
                      must have keys date and amount
     """
+    dates = get_date_range()
+    filter_amount = get_amount()
     filtered_payments = []
     for payment in payments:
         try:
-            dates = get_date_range()
-            filter_amount = get_amount()
             if dates[0] <= payment['date'] <= dates[1]:
                 if float(payment['amount']) >= filter_amount:
                     filtered_payments.append(payment)
@@ -145,21 +158,22 @@ def create_final_file(filtered_payments, to_final_file):
 
     file_out = open(to_final_file, 'w', encoding='utf-8')
 
-    # Format text file to have columns aligned
-    padding = 2
-    # Calculate columns widths
-    col_width_date = max(len(row[0]) for row in filtered_payments) + padding
-    col_width_company = max(len(row[1]) for row in filtered_payments) + padding
-    col_width_var_symbol = max(len(row[2]) for row in filtered_payments) + padding
-    
     if len(filtered_payments) < 1:
         file_out.write("Nic nenalezeno")
-    for row_final in filtered_payments:
-        file_out.write(row_final[0].ljust(col_width_date)
-                       + row_final[1].ljust(col_width_company)
-                       + row_final[2].ljust(col_width_var_symbol)
-                       + row_final[3].ljust(col_width_var_symbol)
-                       + "\n")
+    else:
+       # Format text file to have columns aligned
+        padding = 2
+        # Calculate columns widths
+        col_width_date = max(len(row['date']) for row in filtered_payments) + padding
+        col_width_company = max(len(row['name']) for row in filtered_payments) + padding
+        col_width_var_symbol = max(len(row['var_symbol']) for row in filtered_payments) + padding
+      
+        for row_final in filtered_payments:
+            file_out.write(row_final['date'].ljust(col_width_date)
+                           + row_final['name'].ljust(col_width_company)
+                           + row_final['var_symbol'].ljust(col_width_var_symbol)
+                           + row_final['amount'].ljust(col_width_var_symbol)
+                           + "\n")
 
     file_out.close()
 
