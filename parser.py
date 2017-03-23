@@ -9,6 +9,7 @@ from tkinter import filedialog
 
 
 def get_days():
+    """ Ask user and return int representing nr. of users."""
     while True:
         try:
             x = int(input("Údaje za kolik posledních dnů Vás zajímají? \n"))
@@ -19,6 +20,7 @@ def get_days():
 
 
 def get_date_range():
+    """ Return date range of of last user specified days."""
     days = get_days()
     from_date = datetime.datetime.now() + datetime.timedelta(-int(days))
     to_date = datetime.datetime.now()
@@ -26,9 +28,10 @@ def get_date_range():
 
 
 def get_amount():
+    """ Ask user and return float representation amount"""
     while True:
         try:
-            amount = int(input("Nad jakou částku mají platby být? \n"
+            amount = float(input("Nad jakou částku mají platby být? \n"
                          "Zadejte prosím číslo bez mezer \n"))
             break
         except ValueError:
@@ -38,6 +41,7 @@ def get_amount():
 
 # Show file dialog and get the path of the file
 def get_file_path():
+    """ Ask user and return path of file to filter"""
     root = tk.Tk()
     root.withdraw()
     user_file_path = filedialog.askopenfilename()
@@ -45,6 +49,14 @@ def get_file_path():
 
 
 def get_csv_reader(csv_file, encoding, delimiter, quotechar):
+    """ Open file in csv_reader and return the reader
+
+    :param csv_file: file to open
+    :param encoding: encoding of the file 
+    :param delimiter: A one-character string used to separate fields
+    :param quotechar: A one-character string used to quote fields 
+                      containing special characters
+    """
     opened_csv_file = open(csv_file, newline='', encoding=encoding)
     csv_reader = csv.reader(opened_csv_file,
                             delimiter=delimiter,
@@ -53,7 +65,15 @@ def get_csv_reader(csv_file, encoding, delimiter, quotechar):
 
 
 def get_clean_table(columns, csv_reader):
-    columns = [amount:, date:, name: symbol:]
+    """ Return dictionary with specified columns. 
+
+    :param columns: dictionary in the format {column_type: column_number} 
+    required keys: date, name, var_symbol, amount
+    value: int
+
+    :param csv_reader: csv_reader with a file to filter
+    """
+    columns = [amount:, date:, name: var_symbol:]
     filtered_csv = []
     for csv_row in csv_reader:
         try:
@@ -63,13 +83,19 @@ def get_clean_table(columns, csv_reader):
         else:
             filtered_csv_row = [csv_row[columns[date]],
                                 csv_row[columns[name]],
-                                csv_row[columns[symbol]],
+                                csv_row[columns[var_symbol]],
                                 csv_row[columns[amount]]]
             filtered_csv.append(filtered_csv_row)
     return filtered_csv
 
 
 def date_from_string(date_string, date_format):
+    """ Return date string as datetime object
+
+    :param date_string: string with date to parse
+    :param date_format: date_string format following strptime(format)
+                        directives
+    """
     try:
         date = datetime.datetime.strptime(date_string, date_format)
     except ValueError:
@@ -77,7 +103,12 @@ def date_from_string(date_string, date_format):
     return date
 
 
-def get_filtered_payments(payments, filter_amount):
+def get_filtered_payments(payments):
+    """ Return payment following user given filters
+
+    :param payments: dictionary of payments 
+                     must have keys date and amount
+    """
     filtered_payments = []
     for payment in payments:
         try:
@@ -93,6 +124,11 @@ def get_filtered_payments(payments, filter_amount):
 
 
 def create_final_file(filtered_payments, to_final_file):
+    """ Use filtered payments to create formatted file
+
+    :param filtered_payments: dictionary of payments
+    :param to_final_file: string name of the final output file
+    """
     try:
         os.remove(to.final_file)
     except OSError:
