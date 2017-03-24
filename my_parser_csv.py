@@ -164,7 +164,7 @@ def create_final_file(filtered_payments, to_final_file):
         file_out.write("Nic nenalezeno")
     else:
        # Format text file to have columns aligned
-        padding = 2
+        padding = 4
         # Calculate columns widths
         col_width_date = max(len(row['date']) for row in filtered_payments) + padding
         col_width_company = max(len(row['name']) for row in filtered_payments) + padding
