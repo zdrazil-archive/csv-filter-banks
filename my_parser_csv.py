@@ -151,6 +151,7 @@ def create_final_file(filtered_payments, to_final_file):
     :param filtered_payments: dictionary of payments
     :param to_final_file: string name of the final output file
     """
+    to_final_file = os.path.expanduser("~/Desktop/" + to_final_file)
     try:
         os.remove(to_final_file)
     except OSError:
