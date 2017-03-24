@@ -11,11 +11,11 @@ def get_days():
     """ Ask user and return int representing nr. of users."""
     while True:
         try:
-            x = int(input("Údaje za kolik posledních dnů Vás zajímají? \n"))
+            days = int(input("Údaje za kolik posledních dnů Vás zajímají? \n"))
             break
         except ValueError:
             print("Zadejte prosím číslo bez mezer")
-    return x
+    return days
 
 
 def get_date_range():
@@ -50,9 +50,9 @@ def get_file_path():
 def get_csv_reader(encoding, delimiter, quotechar):
     """ Open file in csv_reader and return the reader
 
-    :param encoding: encoding of the file 
+    :param encoding: encoding of the file
     :param delimiter: A one-character string used to separate fields
-    :param quotechar: A one-character string used to quote fields 
+    :param quotechar: A one-character string used to quote fields
                       containing special characters
     """
     csv_file = get_file_path()
@@ -78,9 +78,9 @@ def date_from_string(date_string, date_format):
 
 
 def get_payments(columns, csv_reader, date_format):
-    """ Return dictionary with specified columns. 
+    """ Return dictionary with specified columns.
 
-    :param columns: dictionary in the format {column_type: column_number} 
+    :param columns: dictionary in the format {column_type: column_number}
     required keys: date, name, var_symbol, amount
     value: int
 
@@ -90,7 +90,7 @@ def get_payments(columns, csv_reader, date_format):
     filtered_csv = []
     for csv_row in csv_reader:
         # Check if it's a header or incomplete row
-        if len(csv_row) < 5: 
+        if len(csv_row) < 5:
             continue
 
         try:
@@ -101,7 +101,7 @@ def get_payments(columns, csv_reader, date_format):
         except ValueError:
             continue
 
-        temp_date = date_from_string(csv_row[columns['date']], date_format)         
+        temp_date = date_from_string(csv_row[columns['date']], date_format)
         filtered_csv_row = {'date': temp_date,
                             'name': csv_row[columns['name']],
                             'var_symbol': csv_row[columns['var_symbol']],
@@ -113,7 +113,7 @@ def get_payments(columns, csv_reader, date_format):
 def filter_payments(payments):
     """ Return payment following user given filters
 
-    :param payments: dictionary of payments 
+    :param payments: dictionary of payments
                      must have keys date and amount
     """
     dates = get_date_range()
@@ -126,12 +126,12 @@ def filter_payments(payments):
                     filtered_payments.append(payment)
         except ValueError:
             pass
-                                                 
+
     return filtered_payments
 
 
 def format_date(date):
-    """ Return formatted date 
+    """ Return formatted date
 
     :param date: datetime object
     """
@@ -171,7 +171,7 @@ def create_final_file(filtered_payments, to_final_file):
         col_width_company = max(len(row['name']) for row in filtered_payments) + padding
         col_width_var_symbol = max(len(row['var_symbol']) for row in filtered_payments) + padding
         col_width_amount = max(len(row['amount']) for row in filtered_payments)
-      
+
         for row_final in filtered_payments:
             file_out.write(row_final['date'].ljust(col_width_date)
                            + row_final['name'].ljust(col_width_company)
