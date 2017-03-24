@@ -169,12 +169,13 @@ def create_final_file(filtered_payments, to_final_file):
         col_width_date = max(len(row['date']) for row in filtered_payments) + padding
         col_width_company = max(len(row['name']) for row in filtered_payments) + padding
         col_width_var_symbol = max(len(row['var_symbol']) for row in filtered_payments) + padding
+        col_width_amount = max(len(row['amount']) for row in filtered_payments)
       
         for row_final in filtered_payments:
             file_out.write(row_final['date'].ljust(col_width_date)
                            + row_final['name'].ljust(col_width_company)
                            + row_final['var_symbol'].ljust(col_width_var_symbol)
-                           + row_final['amount'].ljust(col_width_var_symbol)
+                           + row_final['amount'].rjust(col_width_amount)
                            + "\n")
 
     file_out.close()
