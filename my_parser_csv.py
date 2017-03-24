@@ -85,10 +85,11 @@ def get_payments(columns, csv_reader, date_format):
     value: int
 
     :param csv_reader: csv_reader with a file to filter
+    :param date_format: format of the date in csv file
     """
     filtered_csv = []
     for csv_row in csv_reader:
-       # Check if it's a header or incomplete row
+        # Check if it's a header or incomplete row
         if len(csv_row) < 5: 
             continue
 
@@ -101,7 +102,7 @@ def get_payments(columns, csv_reader, date_format):
             continue
 
         temp_date = date_from_string(csv_row[columns['date']], date_format)         
-        filtered_csv_row = { 'date': temp_date,
+        filtered_csv_row = {'date': temp_date,
                             'name': csv_row[columns['name']],
                             'var_symbol': csv_row[columns['var_symbol']],
                             'amount': csv_row[columns['amount']]}
@@ -163,7 +164,7 @@ def create_final_file(filtered_payments, to_final_file):
     if len(filtered_payments) < 1:
         file_out.write("Nic nenalezeno")
     else:
-       # Format text file to have columns aligned
+        # Format text file to have columns aligned
         padding = 4
         # Calculate columns widths
         col_width_date = max(len(row['date']) for row in filtered_payments) + padding
