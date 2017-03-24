@@ -183,6 +183,4 @@ def create_final_file(filtered_payments, to_final_file):
     output_file_path = os.path.abspath(to_final_file)
     print("\n Soubor byl vytvořen. Jmenuje se " + to_final_file
           + "a je ve složce \n"
-          "odkud jste spustil/a tento program, tedy zde: \n"
           + output_file_path)
-
