@@ -142,6 +142,7 @@ def format_amount(amount_string):
 
     :param amount_string: float amount string
     """
+    locale.setlocale(locale.LC_ALL, '')
     return locale.format("%.2f", float(amount_string), grouping=True)
 
 
