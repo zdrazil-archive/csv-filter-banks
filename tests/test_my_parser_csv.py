@@ -1,6 +1,4 @@
 from .context import my_parser_csv
-import locale
-import datetimes
 
 
 def test_format_amount():
