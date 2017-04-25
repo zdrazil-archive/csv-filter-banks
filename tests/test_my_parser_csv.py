@@ -1,4 +1,5 @@
 from .context import my_parser_csv
+import locale
 
 
 def test_format_amount():
