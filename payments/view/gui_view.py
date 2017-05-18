@@ -246,7 +246,7 @@ class DaysBack:
         :param master: parent master to construct with.
         """
         self.description = ttk.Label(master, text="Dnů zpátky:")
-        self.spinbox = tk.Spinbox(master, from_=1.0, to=tk.sys.maxsize)
+        self.spinbox = tk.Spinbox(master, from_=0.0, to=tk.sys.maxsize)
 
         self.description.grid(column=0, row=4, sticky=(N, W), padx=5)
         self.spinbox.grid(column=0, row=5, sticky=(N, W), padx=5)
